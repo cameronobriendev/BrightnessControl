@@ -4,6 +4,10 @@
 
 A native Swift-based macOS menu bar app that provides fine-grained control over display brightness for both internal and external displays. Features keyboard shortcuts, visual overlay feedback, and direct DDC/CI hardware control.
 
+## Why No Demo?
+
+This app controls brightness through **gamma table adjustments**—a software-based method that changes how your display renders colors to simulate brightness changes. While you see the screen get brighter or darker with your eyes, gamma changes don't affect the actual pixel values captured in screenshots or screen recordings. Any demo would look identical before/after, even though the perceived brightness is dramatically different when viewing the actual screen.
+
 ## Tech Stack
 
 - **Swift 5.9+**
