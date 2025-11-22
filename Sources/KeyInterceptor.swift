@@ -4,8 +4,8 @@ import Foundation
 import AudioToolbox
 
 // Keyboard shortcut key codes
-private let kVK_U: Int64 = 32  // U key for Cmd+U (brightness down)
-private let kVK_I: Int64 = 34  // I key for Cmd+I (brightness up)
+private let kVK_UpArrow: Int64 = 126    // Up arrow (Cmd+Ctrl+Up for brightness up)
+private let kVK_DownArrow: Int64 = 125  // Down arrow (Cmd+Ctrl+Down for brightness down)
 private let kVK_F6_codes: [Int64] = [97, 105]  // F6: Standard Mac (97) or USB keyboard (might vary)
 
 class KeyInterceptor {
@@ -66,7 +66,11 @@ class KeyInterceptor {
             callback: { proxy, type, event, refcon in
                 guard let refcon = refcon else { return Unmanaged.passUnretained(event) }
                 let interceptor = Unmanaged<KeyInterceptor>.fromOpaque(refcon).takeUnretainedValue()
-                return interceptor.handleEvent(proxy: proxy, type: type, event: event)
+                // Return nil to consume event, or pass through
+                if let result = interceptor.handleEvent(proxy: proxy, type: type, event: event) {
+                    return result
+                }
+                return nil  // Consume the event
             },
             userInfo: Unmanaged.passUnretained(self).toOpaque()
         ) else {
@@ -86,11 +90,11 @@ class KeyInterceptor {
         // Enable tap
         CGEvent.tapEnable(tap: tap, enable: true)
 
-        NSLog("✅ KeyInterceptor: Initialized successfully - ready to capture Cmd+U/Cmd+I/F6")
-        print("Key interceptor initialized successfully - Cmd+U (down), Cmd+I (up), F6 (warm tint)")
+        NSLog("✅ KeyInterceptor: Initialized successfully - ready to capture Cmd+Ctrl+Up/Down/F6")
+        print("Key interceptor initialized successfully - Cmd+Ctrl+Down (down), Cmd+Ctrl+Up (up), F6 (warm tint)")
     }
 
-    private func handleEvent(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent> {
+    private func handleEvent(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent) -> Unmanaged<CGEvent>? {
         // Only process key down events
         guard type == .keyDown else {
             return Unmanaged.passUnretained(event)
@@ -101,21 +105,21 @@ class KeyInterceptor {
         let flags = event.flags
         NSLog("🔑 KEY EVENT: keyCode=\(keyCode), flags=\(flags.rawValue)")
 
-        // Check for Command key modifier
-        let commandPressed = flags.contains(.maskCommand)
+        // Check for Command+Control modifiers (no other modifiers)
+        let cmdCtrlPressed = flags.contains(.maskCommand) && flags.contains(.maskControl)
 
-        // Check for Cmd+U (brightness down) or Cmd+I (brightness up)
-        if commandPressed && keyCode == kVK_U {
-            NSLog("🔑 Detected: Cmd+U (Brightness Down)")
+        // Check for Cmd+Ctrl+Down (brightness down) or Cmd+Ctrl+Up (brightness up)
+        if cmdCtrlPressed && keyCode == kVK_DownArrow {
+            NSLog("🔑 Detected: Cmd+Ctrl+Down (Brightness Down)")
             handleBrightnessDown()
-            return Unmanaged.passRetained(CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false)!)
-        } else if commandPressed && keyCode == kVK_I {
-            NSLog("🔑 Detected: Cmd+I (Brightness Up)")
+            return nil  // Consume the event
+        } else if cmdCtrlPressed && keyCode == kVK_UpArrow {
+            NSLog("🔑 Detected: Cmd+Ctrl+Up (Brightness Up)")
             handleBrightnessUp()
-            return Unmanaged.passRetained(CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false)!)
+            return nil  // Consume the event
         } else if kVK_F6_codes.contains(keyCode) {
             handleWarmTintToggle()
-            return Unmanaged.passRetained(CGEvent(keyboardEventSource: nil, virtualKey: 0, keyDown: false)!)
+            return nil  // Consume the event
         }
 
         return Unmanaged.passUnretained(event)

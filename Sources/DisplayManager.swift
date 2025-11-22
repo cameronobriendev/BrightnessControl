@@ -35,9 +35,11 @@ class DisplayManager {
             queue: .main
         ) { [weak self] _ in
             NSLog("🖥️ Screens WOKE - restoring brightness settings")
-            // Small delay to ensure displays are fully initialized
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self?.restoreAllBrightness()
+            // Multiple attempts - macOS may reset gamma after initial wake
+            for delay in [0.5, 1.5, 3.0] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    self?.restoreAllBrightness()
+                }
             }
         }
 
@@ -48,8 +50,11 @@ class DisplayManager {
             queue: .main
         ) { [weak self] _ in
             NSLog("🖥️ System WOKE - restoring brightness settings")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self?.restoreAllBrightness()
+            // Multiple attempts with longer delays for full system wake
+            for delay in [1.0, 2.5, 5.0] {
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    self?.restoreAllBrightness()
+                }
             }
         }
 

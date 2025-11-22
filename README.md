@@ -20,8 +20,8 @@ This app controls brightness through **gamma table adjustments**—a software-ba
 ### Core Functionality
 
 - **Intuitive Keyboard Shortcuts** - System-wide hotkeys for quick brightness adjustment
-  - `Cmd+U` - Decrease brightness
-  - `Cmd+I` - Increase brightness
+  - `Cmd+Ctrl+Down` - Decrease brightness
+  - `Cmd+Ctrl+Up` - Increase brightness
   - Automatically detects which display to adjust based on cursor position
 
 - **Automatic Warm Tint** - Eye-friendly color temperature adjustment applied to all brightness levels
@@ -73,14 +73,14 @@ After first launch, macOS will prompt you to grant Accessibility permissions:
 2. Enable permissions for BrightnessControl
 3. Restart the app
 
-This is required for global keyboard shortcuts (`Cmd+U` / `Cmd+I`) to function.
+This is required for global keyboard shortcuts (`Cmd+Ctrl+Up/Down`) to function.
 
 ### Usage
 
 Once installed and running:
 - The app appears in your menu bar
-- Press `Cmd+U` to decrease brightness on the display under your cursor
-- Press `Cmd+I` to increase brightness on the display under your cursor
+- Press `Cmd+Ctrl+Down` to decrease brightness on the display under your cursor
+- Press `Cmd+Ctrl+Up` to increase brightness on the display under your cursor
 - Warm tint is automatically applied at all brightness levels
 
 ## How It Works
