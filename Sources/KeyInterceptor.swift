@@ -126,33 +126,53 @@ class KeyInterceptor {
     }
 
     private func handleBrightnessUp() {
-        // Get display under mouse cursor
-        guard let displayID = displayManager?.getDisplayUnderMouse() else {
-            NSLog("⚠️ KEY: No display found under mouse")
-            return
-        }
-
-        NSLog("⌨️ KEY: F4 (Brightness UP) pressed for display \(displayID)")
-
         // Single beep for feedback
         AudioServicesPlaySystemSound(1000)
 
-        brightnessController?.adjustBrightness(delta: brightnessStep, for: displayID)
+        // Check if link mode is enabled
+        if StatusBarController.isLinkDisplaysEnabled() {
+            guard let allDisplays = displayManager?.getAllDisplayIDs(), !allDisplays.isEmpty else {
+                NSLog("⚠️ KEY: No displays found")
+                return
+            }
+            NSLog("⌨️ KEY: Brightness UP (linked) for \(allDisplays.count) displays")
+            for displayID in allDisplays {
+                brightnessController?.adjustBrightness(delta: brightnessStep, for: displayID)
+            }
+        } else {
+            // Get display under mouse cursor
+            guard let displayID = displayManager?.getDisplayUnderMouse() else {
+                NSLog("⚠️ KEY: No display found under mouse")
+                return
+            }
+            NSLog("⌨️ KEY: Brightness UP for display \(displayID)")
+            brightnessController?.adjustBrightness(delta: brightnessStep, for: displayID)
+        }
     }
 
     private func handleBrightnessDown() {
-        // Get display under mouse cursor
-        guard let displayID = displayManager?.getDisplayUnderMouse() else {
-            NSLog("⚠️ KEY: No display found under mouse")
-            return
-        }
-
-        NSLog("⌨️ KEY: F3 (Brightness DOWN) pressed for display \(displayID)")
-
         // Single beep for feedback
         AudioServicesPlaySystemSound(1000)
 
-        brightnessController?.adjustBrightness(delta: -brightnessStep, for: displayID)
+        // Check if link mode is enabled
+        if StatusBarController.isLinkDisplaysEnabled() {
+            guard let allDisplays = displayManager?.getAllDisplayIDs(), !allDisplays.isEmpty else {
+                NSLog("⚠️ KEY: No displays found")
+                return
+            }
+            NSLog("⌨️ KEY: Brightness DOWN (linked) for \(allDisplays.count) displays")
+            for displayID in allDisplays {
+                brightnessController?.adjustBrightness(delta: -brightnessStep, for: displayID)
+            }
+        } else {
+            // Get display under mouse cursor
+            guard let displayID = displayManager?.getDisplayUnderMouse() else {
+                NSLog("⚠️ KEY: No display found under mouse")
+                return
+            }
+            NSLog("⌨️ KEY: Brightness DOWN for display \(displayID)")
+            brightnessController?.adjustBrightness(delta: -brightnessStep, for: displayID)
+        }
     }
 
     private func handleWarmTintToggle() {

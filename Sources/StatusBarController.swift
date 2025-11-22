@@ -1,10 +1,21 @@
 import AppKit
+import ServiceManagement
 
 class StatusBarController {
     private var statusItem: NSStatusItem?
     private var menu: NSMenu?
     private var displayManager: DisplayManager?
     private var keyInterceptor: KeyInterceptor?
+    private var launchAtLoginItem: NSMenuItem?
+    private var linkDisplaysItem: NSMenuItem?
+
+    // UserDefaults key for link displays setting
+    private static let linkDisplaysKey = "linkDisplays"
+
+    // Class method for KeyInterceptor to check link mode
+    static func isLinkDisplaysEnabled() -> Bool {
+        return UserDefaults.standard.bool(forKey: linkDisplaysKey)
+    }
 
     init() {
         // Create status bar item with icon
@@ -64,10 +75,53 @@ class StatusBarController {
         // Separator
         menu.addItem(NSMenuItem.separator())
 
+        // Link Displays option
+        linkDisplaysItem = NSMenuItem(title: "Link Displays", action: #selector(toggleLinkDisplays), keyEquivalent: "")
+        linkDisplaysItem?.target = self
+        linkDisplaysItem?.state = StatusBarController.isLinkDisplaysEnabled() ? .on : .off
+        menu.addItem(linkDisplaysItem!)
+
+        // Launch at Login option
+        launchAtLoginItem = NSMenuItem(title: "Launch at Login", action: #selector(toggleLaunchAtLogin), keyEquivalent: "")
+        launchAtLoginItem?.target = self
+        if #available(macOS 13.0, *) {
+            launchAtLoginItem?.state = SMAppService.mainApp.status == .enabled ? .on : .off
+        } else {
+            launchAtLoginItem?.state = .off
+            launchAtLoginItem?.isEnabled = false
+            launchAtLoginItem?.title = "Launch at Login (requires macOS 13+)"
+        }
+        menu.addItem(launchAtLoginItem!)
+
         // Quit option
         let quitItem = NSMenuItem(title: "Quit", action: #selector(quit), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
+    }
+
+    @objc func toggleLinkDisplays() {
+        let newValue = !StatusBarController.isLinkDisplaysEnabled()
+        UserDefaults.standard.set(newValue, forKey: StatusBarController.linkDisplaysKey)
+        linkDisplaysItem?.state = newValue ? .on : .off
+        NSLog("🔗 Link Displays: \(newValue ? "enabled" : "disabled")")
+    }
+
+    @objc func toggleLaunchAtLogin() {
+        if #available(macOS 13.0, *) {
+            do {
+                if SMAppService.mainApp.status == .enabled {
+                    try SMAppService.mainApp.unregister()
+                    launchAtLoginItem?.state = .off
+                    NSLog("🚀 Disabled launch at login")
+                } else {
+                    try SMAppService.mainApp.register()
+                    launchAtLoginItem?.state = .on
+                    NSLog("🚀 Enabled launch at login")
+                }
+            } catch {
+                NSLog("🚀 Failed to toggle launch at login: \(error)")
+            }
+        }
     }
 
     @objc func quit() {

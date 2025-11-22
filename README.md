@@ -32,7 +32,10 @@ This app controls brightness through **gamma table adjustments**—a software-ba
 - **Smart Display Management**
   - Automatically detects internal (MacBook) and external displays
   - Cursor-based display targeting (adjusts the display your mouse is on)
+  - **Link Displays mode** - Adjust all monitors simultaneously with one hotkey
   - Separate control strategies optimized for each display type
+
+- **Launch at Login** - Optional auto-start after system sleep/restart (macOS 13+)
 
 - **Persistent Settings with Sleep/Wake Memory**
   - Remembers brightness per display across app restarts
@@ -78,10 +81,14 @@ This is required for global keyboard shortcuts (`Cmd+Ctrl+Up/Down`) to function.
 ### Usage
 
 Once installed and running:
-- The app appears in your menu bar
+- The app appears in your menu bar with a sun icon
 - Press `Cmd+Ctrl+Down` to decrease brightness on the display under your cursor
 - Press `Cmd+Ctrl+Up` to increase brightness on the display under your cursor
 - Warm tint is automatically applied at all brightness levels
+
+**Menu Bar Options:**
+- **Link Displays** - Toggle to adjust all monitors simultaneously
+- **Launch at Login** - Toggle to auto-start after system restart (macOS 13+)
 
 ## How It Works
 

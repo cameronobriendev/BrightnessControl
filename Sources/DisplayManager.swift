@@ -187,6 +187,10 @@ class DisplayManager {
         return brightnessController
     }
 
+    func getAllDisplayIDs() -> [CGDirectDisplayID] {
+        return displays
+    }
+
     func cleanup() {
         brightnessController?.cleanup()
     }
